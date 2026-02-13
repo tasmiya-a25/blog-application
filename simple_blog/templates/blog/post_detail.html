@@ -1,198 +1,245 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ post.title }} - Simple Blog{% endblock %}
+{% block title %}{{ post.title }} | Simple Blog{% endblock %}
 
 {% block content %}
-<!-- Post Header -->
-<div class="row">
+
+<div class="row g-4">
+
+    <!-- MAIN CONTENT -->
     <div class="col-lg-8">
-        <article class="card">
-            <div class="card-body">
-                <div class="mb-4">
-                    <h1 class="display-5 fw-bold mb-3">{{ post.title }}</h1>
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="post-meta">
-                            <span class="me-3">
-                                <i class="fas fa-user text-primary me-1"></i>
-                                <strong>{{ post.author }}</strong>
+
+        <!-- Post Card -->
+        <article class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4">
+
+                <!-- Title -->
+                <h1 class="fw-bold mb-3">{{ post.title }}</h1>
+
+                <!-- Meta Info -->
+                <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
+                    <div>
+                        <span class="me-3 text-muted">
+                            <i class="fas fa-user text-primary me-1"></i>
+                            <strong>{{ post.author }}</strong>
+                        </span>
+
+                        {% if post.category %}
+                            <span class="badge bg-light text-dark border">
+                                {{ post.category.name }}
                             </span>
-                            {% if post.category %}
-                                <span class="badge bg-info me-3">{{ post.category.name }}</span>
-                            {% endif %}
-                        </div>
-                        <div class="text-muted">
-                            <i class="fas fa-calendar me-1"></i>{{ post.created_date|date:"M d, Y" }}
-                        </div>
+                        {% endif %}
                     </div>
+
+                    <small class="text-muted mt-2 mt-md-0">
+                        <i class="fas fa-calendar-alt me-1"></i>
+                        {{ post.created_date|date:"M d, Y" }}
+                    </small>
                 </div>
-                
-                <!-- Post Content -->
-                <div class="post-content">
-                    <p class="lead">{{ post.content|linebreaks }}</p>
+
+                <!-- Content -->
+                <div class="post-content fs-5 text-muted mb-4">
+                    {{ post.content|linebreaks }}
                 </div>
-                
-                <!-- Post Footer -->
-                <div class="border-top pt-3 mt-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <small class="text-muted">
-                            {% if post.updated_date != post.created_date %}
-                                <i class="fas fa-edit me-1"></i>Last updated: {{ post.updated_date|date:"M d, Y H:i" }}
-                            {% else %}
-                                <i class="fas fa-clock me-1"></i>Published: {{ post.created_date|date:"M d, Y H:i" }}
-                            {% endif %}
-                        </small>
-                        <div>
-                            <a href="{% url 'blog:post_list' %}" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left me-1"></i>Back to Posts
-                            </a>
-                        </div>
-                    </div>
+
+                <!-- Footer -->
+                <div class="border-top pt-3 d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        {% if post.updated_date != post.created_date %}
+                            <i class="fas fa-edit me-1"></i>
+                            Updated: {{ post.updated_date|date:"M d, Y H:i" }}
+                        {% else %}
+                            <i class="fas fa-clock me-1"></i>
+                            Published: {{ post.created_date|date:"M d, Y H:i" }}
+                        {% endif %}
+                    </small>
+
+                    <a href="{% url 'blog:post_list' %}" 
+                       class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                        ← Back to Posts
+                    </a>
                 </div>
+
             </div>
         </article>
-        
-        <!-- Comments Section -->
-        <div class="card mt-4">
-            <div class="card-header">
-                <h4 class="mb-0">
-                    <i class="fas fa-comments me-2"></i>Comments ({{ comments.count }})
+
+
+        <!-- COMMENTS SECTION -->
+        <div class="card border-0 shadow-sm rounded-4 mt-4">
+            <div class="card-body p-4">
+
+                <h4 class="fw-semibold mb-4">
+                    <i class="fas fa-comments me-2"></i>
+                    Comments ({{ comments|length }})
                 </h4>
-            </div>
-            <div class="card-body">
-                <!-- Add Comment Form -->
-                <div class="mb-4">
+
+                <!-- Comment Form -->
+                <div class="mb-5">
                     <h5 class="mb-3">Leave a Comment</h5>
+
                     <form method="post">
                         {% csrf_token %}
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.author.id_for_label }}" class="form-label">Name *</label>
+                                <label class="form-label">Name *</label>
                                 {{ form.author }}
                             </div>
+
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                                <label class="form-label">Email</label>
                                 {{ form.email }}
                             </div>
                         </div>
+
                         <div class="mb-3">
-                            <label for="{{ form.content.id_for_label }}" class="form-label">Comment *</label>
+                            <label class="form-label">Comment *</label>
                             {{ form.content }}
                         </div>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-paper-plane me-2"></i>Post Comment
+
+                        <button type="submit" 
+                                class="btn btn-primary rounded-pill px-4">
+                            <i class="fas fa-paper-plane me-2"></i>
+                            Post Comment
                         </button>
                     </form>
                 </div>
-                
+
                 <!-- Comments List -->
                 {% if comments %}
-                    <div class="comments-list">
-                        {% for comment in comments %}
-                            <div class="comment-item border-bottom pb-3 mb-3">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <div>
-                                        <h6 class="mb-1">{{ comment.author }}</h6>
-                                        {% if comment.email %}
-                                            <small class="text-muted">{{ comment.email }}</small>
-                                        {% endif %}
-                                    </div>
-                                    <small class="text-muted">
-                                        <i class="fas fa-clock me-1"></i>{{ comment.created_date|date:"M d, Y H:i" }}
-                                    </small>
+                    {% for comment in comments %}
+                        <div class="border-top pt-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <strong>{{ comment.author }}</strong>
+                                    {% if comment.email %}
+                                        <small class="text-muted d-block">
+                                            {{ comment.email }}
+                                        </small>
+                                    {% endif %}
                                 </div>
-                                <p class="mb-0">{{ comment.content|linebreaks }}</p>
+
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    {{ comment.created_date|date:"M d, Y H:i" }}
+                                </small>
                             </div>
-                        {% endfor %}
-                    </div>
+
+                            <p class="text-muted mb-0">
+                                {{ comment.content|linebreaks }}
+                            </p>
+                        </div>
+                    {% endfor %}
                 {% else %}
                     <div class="text-center py-4">
                         <i class="fas fa-comment-slash fa-2x text-muted mb-2"></i>
-                        <p class="text-muted">No comments yet. Be the first to comment!</p>
+                        <p class="text-muted mb-0">
+                            No comments yet. Be the first to comment!
+                        </p>
                     </div>
                 {% endif %}
+
             </div>
         </div>
+
     </div>
-    
-    <!-- Sidebar -->
+
+
+    <!-- SIDEBAR -->
     <div class="col-lg-4">
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0">
+
+        <!-- Share Card -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4">
+                <h5 class="fw-semibold mb-3">
                     <i class="fas fa-share-alt me-2"></i>Share This Post
                 </h5>
-            </div>
-            <div class="card-body">
+
                 <div class="d-grid gap-2">
-                    <button class="btn btn-primary" onclick="sharePost()">
-                        <i class="fas fa-share me-2"></i>Share Post
+                    <button class="btn btn-primary rounded-pill" onclick="sharePost()">
+                        <i class="fas fa-share me-2"></i>Share
                     </button>
-                    <button class="btn btn-outline-secondary" onclick="copyLink()">
+
+                    <button class="btn btn-outline-secondary rounded-pill" onclick="copyLink(this)">
                         <i class="fas fa-link me-2"></i>Copy Link
                     </button>
                 </div>
             </div>
         </div>
-        
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-folder me-2"></i>Categories
+
+        <!-- Category Card -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-4">
+                <h5 class="fw-semibold mb-3">
+                    <i class="fas fa-folder me-2"></i>Category
                 </h5>
-            </div>
-            <div class="card-body">
+
                 {% if post.category %}
-                    <span class="badge bg-info">{{ post.category.name }}</span>
+                    <a href="{% url 'blog:category_posts' post.category.slug %}" 
+                       class="badge bg-light text-dark border text-decoration-none p-2">
+                        {{ post.category.name }}
+                    </a>
                 {% else %}
-                    <p class="text-muted">Uncategorized</p>
+                    <p class="text-muted mb-0">Uncategorized</p>
                 {% endif %}
             </div>
         </div>
-        
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
+
+        <!-- Navigation -->
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body p-4">
+                <h5 class="fw-semibold mb-3">
                     <i class="fas fa-compass me-2"></i>Navigate
                 </h5>
-            </div>
-            <div class="card-body">
+
                 <div class="d-grid gap-2">
-                    <a href="{% url 'blog:home' %}" class="btn btn-outline-primary">
-                        <i class="fas fa-home me-2"></i>Home
+                    <a href="{% url 'blog:home' %}" 
+                       class="btn btn-outline-primary rounded-pill">
+                        Home
                     </a>
-                    <a href="{% url 'blog:post_list' %}" class="btn btn-outline-primary">
-                        <i class="fas fa-list me-2"></i>All Posts
+
+                    <a href="{% url 'blog:post_list' %}" 
+                       class="btn btn-outline-primary rounded-pill">
+                        All Posts
                     </a>
+
                     {% if post.category %}
-                        <a href="{% url 'blog:category_posts' post.category.name %}" class="btn btn-outline-secondary">
-                            <i class="fas fa-tag me-2"></i>More in {{ post.category.name }}
+                        <a href="{% url 'blog:category_posts' post.category.slug %}" 
+                           class="btn btn-outline-secondary rounded-pill">
+                            More in {{ post.category.name }}
                         </a>
                     {% endif %}
                 </div>
             </div>
         </div>
+
     </div>
+
 </div>
+
 {% endblock %}
+
 
 {% block extra_js %}
 <script>
 function sharePost() {
     if (navigator.share) {
         navigator.share({
-            title: '{{ post.title }}',
-            text: 'Check out this amazing post!',
+            title: "{{ post.title }}",
+            text: "Check out this blog post!",
             url: window.location.href
         });
     } else {
-        alert('Sharing not supported on this device');
+        alert("Sharing not supported on this device.");
     }
 }
 
-function copyLink() {
+function copyLink(button) {
     navigator.clipboard.writeText(window.location.href).then(function() {
-        alert('Link copied to clipboard!');
+        button.innerHTML = "Copied!";
+        setTimeout(() => {
+            button.innerHTML = '<i class="fas fa-link me-2"></i>Copy Link';
+        }, 1500);
     });
 }
 </script>
