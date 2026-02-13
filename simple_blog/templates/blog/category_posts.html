@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ category.name }} Posts - Simple Blog{% endblock %}
+
+{% block content %}
+<!-- Category Header -->
+<div class="row">
+    <div class="col-12">
+        <div class="card bg-primary text-white mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="display-5 fw-bold mb-2">
+                            <i class="fas fa-folder me-3"></i>{{ category.name }}
+                        </h1>
+                        {% if category.description %}
+                            <p class="lead mb-0">{{ category.description }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="text-center">
+                        <h2 class="mb-0">{{ posts.count }}</h2>
+                        <small>Posts</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Posts in Category -->
+<div class="row">
+    <div class="col-lg-8">
+        {% if posts %}
+            {% for post in posts %}
+                <article class="card mb-4 post-card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h3 class="card-title">
+                                <a href="{% url 'blog:post_detail' post.pk %}" class="text-decoration-none">
+                                    {{ post.title }}
+                                </a>
+                            </h3>
+                            <span class="badge bg-light text-dark">{{ category.name }}</span>
+                        </div>
+                        
+                        <p class="card-text">{{ post.content|truncatewords:40 }}</p>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="post-meta">
+                                <span class="text-muted">
+                                    <i class="fas fa-user me-1"></i>{{ post.author }}
+                                </span>
+                                <span class="text-muted ms-3">
+                                    <i class="fas fa-calendar me-1"></i>{{ post.created_date|date:"M d, Y" }}
+                                </span>
+                            </div>
+                            <a href="{% url 'blog:post_detail' post.pk %}" class="btn btn-primary">
+                                Read More <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No posts in {{ category.name }}</h4>
+                <p class="text-muted">Be the first to write a post in this category!</p>
+                <a href="/admin/blog/post/add/" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Create Post
+                </a>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Category Info
+                </h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Name:</strong> {{ category.name }}</p>
+                {% if category.description %}
+                    <p><strong>Description:</strong> {{ category.description }}</p>
+                {% endif %}
+                <p><strong>Posts:</strong> {{ posts.count }}</p>
+                <p><strong>Created:</strong> {{ category.created_date|date:"M d, Y" }}</p>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-compass me-2"></i>Navigation
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'blog:home' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-home me-2"></i>Home
+                    </a>
+                    <a href="{% url 'blog:post_list' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-list me-2"></i>All Posts
+                    </a>
+                    <a href="/admin/" class="btn btn-outline-secondary">
+                        <i class="fas fa-cog me-2"></i>Admin Panel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
